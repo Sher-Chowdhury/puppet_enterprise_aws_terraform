@@ -28,12 +28,37 @@ resource "aws_instance" "puppet_enterprise_ec2" {
 
 
 resource "aws_security_group" "puppet_enterprices_sg" {
-  name        = "allow_ssh"
-  description = "Allow all ssh traffic"
+  name        = "Allow access to box"
+  description = "Allow all ssh, puppet agent, mcollective"
 
+  # ssh
   ingress {
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # puppet agent runs
+  ingress {
+    from_port   = 8140
+    to_port     = 8140
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # mcollective
+  ingress {
+    from_port   = 61613
+    to_port     = 61613
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # puppet enterprise web console - https
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
