@@ -15,6 +15,10 @@ provider "aws" {
 resource "aws_instance" "puppet_enterprise_ec2" {
    ami = "ami-051b1563"
    instance_type = "t2.micro"
+   user_data = <<-EOF
+               #!/bin/bash
+               touch /tmp/testfile.txt
+               EOF
    tags {
      Name = "Puppet_Enterprise"
      role = "Puppet_Enterprise"
