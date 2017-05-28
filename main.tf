@@ -50,6 +50,7 @@ resource "aws_security_group" "puppet_enterprise_sg" {
 # aws ec2 describe-images --image-ids ami-051b1563
 # monolithic install instance type recommendation (up to 4000 nodes):  c4.4xlarge (16 cores) but I recommend c4.8xlarge (36 cores) so you can run more jvm instances, handy for big mcollective runs
 # https://docs.puppet.com/pe/latest/sys_req_hw.html#monolithic-installation-hardware-requirements
+
 resource "aws_instance" "puppet_enterprise_ec2" {
   ami                    = "ami-051b1563"
   instance_type          = "t2.micro"
@@ -65,3 +66,8 @@ resource "aws_instance" "puppet_enterprise_ec2" {
     role = "Puppet_Enterprise"
   }
 }
+
+# creating a since aws_instance is bad practice. Instead it's
+# better practive to make an autoscaling-group and launch-config
+# resources which I have done further down. That will be covered in v2.0 of this repo.
+
