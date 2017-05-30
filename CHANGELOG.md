@@ -1,4 +1,4 @@
-## 2.0.0 (Unreleased)
+## 2.0.0 (May 28, 2017)
 
 Achieves the same thing as version 1.0.0, but this time using launch configurations and auto-scaling groups. 
 

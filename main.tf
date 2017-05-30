@@ -43,31 +43,42 @@ resource "aws_security_group" "puppet_enterprise_sg" {
   }
 }
 
-# Create a ec2 instance
-# https://wiki.centos.org/Cloud/AWS
-# the "centos.org" owner id is: '679593333241'
-# aws ec2 describe-images --filters "Name=root-device-type,Values=ebs" "Name=name,Values=CentOS Linux 6 x86_64*" # This will least only amis available in the regions specified in the aws provider section
-# aws ec2 describe-images --image-ids ami-051b1563
-# monolithic install instance type recommendation (up to 4000 nodes):  c4.4xlarge (16 cores) but I recommend c4.8xlarge (36 cores) so you can run more jvm instances, handy for big mcollective runs
-# https://docs.puppet.com/pe/latest/sys_req_hw.html#monolithic-installation-hardware-requirements
+resource "aws_launch_configuration" "puppet_enterprise_lc" {
+  name            = "puppet_enterprise"
+  image_id        = "ami-051b1563"
+  instance_type   = "t2.micro"
+  security_groups = ["${aws_security_group.puppet_enterprise_sg.id}"] # https://www.terraform.io/docs/providers/aws/r/security_group.html#attributes-reference
 
-resource "aws_instance" "puppet_enterprise_ec2" {
-  ami                    = "ami-051b1563"
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = ["${aws_security_group.puppet_enterprise_sg.id}"] # https://www.terraform.io/docs/providers/aws/r/security_group.html#attributes-reference
-
-  user_data = <<-EOF
-               #!/bin/bash
-               touch /tmp/testfile.txt
-               EOF
-
-  tags {
-    Name = "${var.puppet_enterprise_name}"
-    role = "Puppet_Enterprise"
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
-# creating a since aws_instance is bad practice. Instead it's
-# better practive to make an autoscaling-group and launch-config
-# resources which I have done further down. That will be covered in v2.0 of this repo.
+# Note for availability_zones, we could just list out all the availability zones that are in a region,
+# however a better approach is to ask aws to provide this information. These are known as datasources:
+# https://www.terraform.io/docs/configuration/data-sources.html
+# In our case, we will use the following datasource:
+# https://www.terraform.io/docs/providers/aws/d/availability_zones.html#
+data "aws_availability_zones" "all-availibility-zones" {}
 
+# you can think of datasources as a bit like puppet's 'facter'
+resource "aws_autoscaling_group" "puppet_enterprise_asg" {
+  name                 = "puppet_enterprise"
+  launch_configuration = "${aws_launch_configuration.puppet_enterprise_lc.id}"
+  min_size             = 1
+  desired_capacity     = 1
+  max_size             = 1
+  availability_zones   = ["${data.aws_availability_zones.all-availibility-zones.names}"]
+
+  tag {
+    key                 = "Name"
+    value               = "puppet_enterprise"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "role"
+    value               = "puppetmaster"
+    propagate_at_launch = true
+  }
+}

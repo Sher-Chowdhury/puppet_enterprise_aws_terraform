@@ -4,9 +4,11 @@
 # for example when creating a new ec2 instance, aws will assign the new instance
 # with things like an private ip adderess, public ip address, instance_id,...and etc:
 # https://www.terraform.io/docs/providers/aws/r/instance.html#attributes-reference
-output "Puppet_Enterprise_Instance_ID" {
-  value = "${aws_instance.puppet_enterprise_ec2.id}"
-}
+
+
+#output "Puppet_Enterprise_Instance_ID" {
+#  value = "${aws_instance.puppet_enterprise_ec2.id}"
+#}
 
 # it's best practice to output all available data. That's because you can
 # call on them later on in your terraform code.
