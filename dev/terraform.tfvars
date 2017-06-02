@@ -7,4 +7,5 @@
 
 # you can call these variables in your other files, e.g. in main.tf using the syntax "${var.variable_name}"
 
-puppet_enterprise_name = "puppetmaster-tfvars"
+puppet_enterprise_name = "puppetmaster"
+env = "dev"

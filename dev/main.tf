@@ -81,4 +81,10 @@ resource "aws_autoscaling_group" "puppet_enterprise_asg" {
     value               = "puppetmaster"
     propagate_at_launch = true
   }
+
+  tag {
+    key                 = "env"
+    value               = "${var.env}"
+    propagate_at_launch = true
+  }
 }

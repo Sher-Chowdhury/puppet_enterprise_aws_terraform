@@ -9,3 +9,6 @@ variable "puppet_enterprise_name" {
   description = "What name do you want to assign the puppet ec2 instance"
   default     = "puppet_enterprise-default"
 }
+variable "env" {
+  description = "Which environment do you want to build into"
+}
