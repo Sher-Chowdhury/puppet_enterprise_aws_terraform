@@ -3,6 +3,7 @@
 resource "aws_security_group" "puppet_enterprise_sg" {
   name        = "puppet_enterprise_sg"
   description = "create ingress rules for ssh, puppet agent, mcollective, and puppet web console"
+  vpc_id      = "${data.terraform_remote_state.tooling_vpc.tooling_vpc_id}"                       # see the 'data_from_other_remote_states.tf' file
 
   # ssh
   ingress {
